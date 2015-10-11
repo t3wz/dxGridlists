@@ -223,7 +223,7 @@ end
 function dxGrid:GetItemDetails ( column, itemID )
     -- string, mixed Gridlist:GetItemDetails ( int columnIndex, int itemIndex )
 
-    if __checkParams ( "GetItemDetails", "nnn", columnID, itemID ) then
+    if __checkParams ( "GetItemDetails", "nn", columnID, itemID ) then
         if self.i[column] then
             if self.i[column][itemID] then
                 return self.i[column][itemID].text, self.i[column][itemID].data
