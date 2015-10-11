@@ -5,7 +5,7 @@
 *	VERSION:		1.0
 *
 *	YOU AREN'T ALLOWED TO SELL THIS SCRIPT OR REMOVE THE AUTHOR'S NAME
-*					EVEN IF YOU MADE SEVERAL CHANGES !
+*	                EVEN IF YOU MADE SEVERAL CHANGES !
 *
 ****************************************************************************]]
 
@@ -54,6 +54,7 @@ end
 
 function dxGrid:SetVisible ( visible )
     -- bool Gridlist:SetVisible ( bool state )
+    
     if __checkParams ( "SetVisible", "b", visible ) then
         self.vis = visible
 
@@ -269,7 +270,7 @@ addEventHandler ( "onClientRender", root,
 
                     -- Is there any column?
                     if #data.i > 0 then
-    					local cWidth = 0
+                    local cWidth = 0
 
                         -- Loop through all columns
                         for cIndex, cData in ipairs ( data.i ) do
