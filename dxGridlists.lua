@@ -2,7 +2,7 @@
 *
 *	PROJECT:		dxGridlists
 *	DEVELOPERS:		t3wz < github.com/t3wz >
-*	VERSION:		1.0
+*	VERSION:		1.1
 *
 *	YOU AREN'T ALLOWED TO SELL THIS SCRIPT OR REMOVE THE AUTHOR'S NAME
 *	                EVEN IF YOU MADE SEVERAL CHANGES !
@@ -117,12 +117,14 @@ function dxGrid:GetColumnCount ()
     return #self.i
 end
 
-function dxGrid:AddItem ( columnIndex, text, data )
+function dxGrid:AddItem ( columnIndex, text, data, r, g, b )
     -- int Gridlist:AddItem ( int columnIndex, string title[, mixed data ] )
 
     if __checkParams ( "AddItem", "ns", columnIndex, text ) then
-        if self.i[columnIndex] then
-            table.insert ( self.i[columnIndex], { id = #self.i[columnIndex] + 1, text = tostring( text ), data = data } );
+        if self.i[columnIndex] then	
+            local tColor = __checkRGB ( r, g, b ) and { r, g, b } or { 255, 255, 255 };
+			
+            table.insert ( self.i[columnIndex], { id = #self.i[columnIndex] + 1, text = tostring( text ), data = data, color = tColor } );
 
             if #self.i[columnIndex] > self.r then
                 self.r = #self.i[columnIndex];
@@ -304,7 +306,7 @@ addEventHandler ( "onClientRender", root,
                                             end
 
                                             -- Draw the item text
-                                            dxDrawText ( cData[iIndex]["text"], x, y, cData.info.width + x, ( 30 % data.h ) + y, tocolor ( 255, 255, 255 ), 1, "default-bold", "center", "center", true, true, data.pg, false, true );
+                                            dxDrawText ( cData[iIndex]["text"], x, y, cData.info.width + x, ( 30 % data.h ) + y, tocolor ( unpack ( cData[iIndex]["color"] ) ), 1, "default-bold", "center", "center", true, true, data.pg, false, true );
                                         end
                                     end
                                 end
@@ -389,6 +391,21 @@ function __checkParams ( methodName, pattern, ... )
         end
     end
     return true;
+end
+
+function __checkRGB ( r, g, b )
+	-- Check if all parameters were passed
+	if ( not r ) or ( not g ) or ( not b ) then
+		return false;
+	end
+	
+	for _, v in ipairs ( { r, g, b } ) do
+		if ( type ( v ) ~= "number" ) or ( v < 0 ) or ( v > 255 ) then
+			return false;
+		end
+	end
+	
+	return true;
 end
 
 function __isMouseInPosition ( x, y, w, h )
