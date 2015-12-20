@@ -2,7 +2,7 @@
 *
 *	PROJECT:		dxGridlists
 *	DEVELOPERS:		t3wz < github.com/t3wz >
-*	VERSION:		1.1
+*	VERSION:		1.2
 *
 *	YOU AREN'T ALLOWED TO SELL THIS SCRIPT OR REMOVE THE AUTHOR'S NAME
 *	                EVEN IF YOU MADE SEVERAL CHANGES !
@@ -12,6 +12,14 @@
 dxGrid          =   { items = {} };
 local cursorOn;
 
+local NATIVE_RESOLUTION		=	{ nil } -- put your screen resolution here to fit the gridlists to all resolutions (ex: { 1366, 768 } )
+if ( table.maxn ( NATIVE_RESOLUTION ) == 2 ) then
+	FIT_MODE				=	true
+	RES                   	=   { guiGetScreenSize() };
+	X,Y                   	=   RES[1] / NATIVE_RESOLUTION[1], RES[2] / NATIVE_RESOLUTION[2];
+	SCALE                 	=   ( 1 / NATIVE_RESOLUTION[1] ) * RES[1];
+end
+
 --=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Core - functions
 
 function dxGrid:Create ( x, y, width, height, postGUI )
@@ -19,18 +27,18 @@ function dxGrid:Create ( x, y, width, height, postGUI )
 
     if __checkParams ( "Create", "nnnn", x, y, width, height ) then
         local data = {
-            x       =       x;                          -- X position
-            y       =       y;                          -- Y position
-            w       =       width;                      -- Width
-            h       =       height;                     -- Height
-            pg      =       postGUI or false;           -- PostGUI
-            i       =       {};                         -- Items
-            mi      =       __calcMaxItems ( height );  -- Max items
-            s       =       1;                          -- Scroll Level
-            r       =       -1;                         -- Row count
-            se      =       -1;                         -- Selected item
-            mo      =       nil;                        -- Mouse-on item
-            vis     =       true                        -- Visible
+            x       =       FIT_MODE and ( x * X ) or x;    							-- X position
+            y       =       FIT_MODE and ( y * Y ) or y;   								-- Y position
+            w       =       FIT_MODE and ( width * X ) or width;						-- Width
+            h       =       FIT_MODE and ( height * Y ) or height; 						-- Height
+            pg      =       postGUI or false;           								-- PostGUI
+            i       =       {};                         								-- Items
+            mi      =       __calcMaxItems ( FIT_MODE and ( height * Y ) or height );	-- Max items
+            s       =       1;                          								-- Scroll Level
+            r       =       -1;                         								-- Row count
+            se      =       -1;                         								-- Selected item
+            mo      =       nil;                        								-- Mouse-on item
+            vis     =       true                        								-- Visible
         };
 
         setmetatable ( data, { __index = dxGrid } );
@@ -75,7 +83,7 @@ function dxGrid:AddColumn ( title, width )
 
     if __checkParams ( "AddColumn", "sn", title, width ) then
         local data = {
-            info    =   { title = title, width = width }
+            info    =   { title = title, width = FIT_MODE and ( width * X ) or width }
         };
 
         table.insert ( self.i, data );
@@ -118,7 +126,7 @@ function dxGrid:GetColumnCount ()
 end
 
 function dxGrid:AddItem ( columnIndex, text, data, r, g, b )
-    -- int Gridlist:AddItem ( int columnIndex, string title[, mixed data ] )
+    -- int Gridlist:AddItem ( int columnIndex, string title[, mixed data, int r, int g, int b ] )
 
     if __checkParams ( "AddItem", "ns", columnIndex, text ) then
         if self.i[columnIndex] then	
@@ -281,7 +289,7 @@ addEventHandler ( "onClientRender", root,
                                 local x = data.x + cWidth;
 
                                 -- Draw the column title
-                                dxDrawText ( cData.info.title, x, data.y, cData.info.width + x, ( 30 % data.h ) + data.y, tocolor ( 255, 255, 255 ), 1, "default-bold", "center", "center", true, true, data.pg, false, true );
+                                dxDrawText ( cData.info.title, x, data.y, cData.info.width + x, ( 30 % data.h ) + data.y, tocolor ( 255, 255, 255 ), FIT_MODE and ( 1 * SCALE ) or 1, "default-bold", "center", "center", true, true, data.pg, false, true );
 
                                 -- Reset the selected item
                                 cData.info.selected = -1;
@@ -306,7 +314,7 @@ addEventHandler ( "onClientRender", root,
                                             end
 
                                             -- Draw the item text
-                                            dxDrawText ( cData[iIndex]["text"], x, y, cData.info.width + x, ( 30 % data.h ) + y, tocolor ( unpack ( cData[iIndex]["color"] ) ), 1, "default-bold", "center", "center", true, true, data.pg, false, true );
+                                            dxDrawText ( cData[iIndex]["text"], x, y, cData.info.width + x, ( 30 % data.h ) + y, tocolor ( unpack ( cData[iIndex]["color"] ) ), FIT_MODE and ( 1 * SCALE ) or 1, "default-bold", "center", "center", true, true, data.pg, false, true );
                                         end
                                     end
                                 end
@@ -362,8 +370,8 @@ addEventHandler ( "onClientKey", root,
 
 function __calcMaxItems ( height )
     for i = 0, 9999 do
-        if ( ( ( i + 1 ) * 25 ) >= height ) then
-            return i;
+        if ( ( ( i + 1 ) * 25 ) >= math.floor ( height ) ) then
+            return ( ( ( i + 1 ) * 25 ) > math.floor ( height ) and ( i - 1 ) or i );
         end
     end
     return false;
